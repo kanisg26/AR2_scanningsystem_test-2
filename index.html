@@ -27,22 +27,20 @@
 
   <main id="app-main">
 
-    <!-- カメラ映像セクション -->
-    <section id="section-camera" class="card">
-      <h2>カメラ映像</h2>
-      <!-- Sensor status bar -->
+    <!-- カメラ映像セクション (全画面) -->
+    <section id="section-camera">
+      <!-- Sensor status bar (overlay) -->
       <div id="sensor-status" class="sensor-status" hidden>
         <span id="sensor-heading">--</span>
         <span id="sensor-elevation">--</span>
         <span id="sensor-level" class="sensor-level">--</span>
         <span id="sensor-accuracy"></span>
       </div>
+      <!-- Point count overlay -->
+      <div id="camera-point-count" class="camera-point-count">0点</div>
       <div id="camera-container">
         <video id="camera-video" autoplay playsinline muted></video>
         <canvas id="camera-overlay"></canvas>
-        <button type="button" id="btn-resume-overlay" class="resume-overlay" hidden>
-          カメラ再開
-        </button>
         <div id="camera-error" class="camera-error" hidden>
           <p id="camera-error-msg">カメラを起動中...</p>
           <button type="button" id="btn-camera-retry" class="btn-primary">再試行</button>
@@ -79,6 +77,7 @@
         <button type="button" class="btn-view" data-view="top">上面</button>
         <button type="button" class="btn-view" data-view="side">側面</button>
         <button type="button" class="btn-view" data-view="iso">3D</button>
+        <button type="button" id="btn-origin-toggle" class="btn-view">原点:始点</button>
       </div>
     </section>
 

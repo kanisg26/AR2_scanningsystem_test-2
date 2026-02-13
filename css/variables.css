@@ -1,0 +1,58 @@
+/* CSS Variables - Design Tokens */
+:root {
+  /* Colors - Primary */
+  --color-primary: #1976D2;
+  --color-primary-dark: #1565C0;
+  --color-primary-light: #42A5F5;
+
+  /* Colors - Accent */
+  --color-accent: #FFD700;
+  --color-route: #FF0000;
+
+  /* Colors - Semantic */
+  --color-success: #4CAF50;
+  --color-warning: #FF9800;
+  --color-danger: #F44336;
+  --color-info: #2196F3;
+
+  /* Colors - Neutral */
+  --color-bg: #f5f5f5;
+  --color-bg-card: #ffffff;
+  --color-text: #333333;
+  --color-text-secondary: #666666;
+  --color-text-light: #999999;
+  --color-border: #e0e0e0;
+  --color-border-focus: #1976D2;
+
+  /* Typography */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-h1: 20px;
+  --font-size-h2: 17px;
+  --font-size-h3: 15px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  /* Touch Target - minimum 44x44px (NFR-P1A-002) */
+  --touch-target-min: 44px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Camera */
+  --camera-min-height: 250px;
+}
