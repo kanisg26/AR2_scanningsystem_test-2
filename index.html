@@ -1,1 +1,299 @@
-# AR2_scanningsystem_test-2
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>配管経路記録 (Web版)</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header id="app-header">
+    <h1>配管経路記録 <span class="version-badge">Web版</span></h1>
+    <div class="header-actions">
+      <button id="btn-settings" type="button" aria-label="設定">設定</button>
+      <button id="btn-help" type="button" aria-label="ヘルプ">?</button>
+    </div>
+  </header>
+
+  <main id="app-main">
+
+    <!-- カメラ映像セクション -->
+    <section id="section-camera" class="card">
+      <h2>カメラ映像</h2>
+      <!-- Sensor status bar -->
+      <div id="sensor-status" class="sensor-status" hidden>
+        <span id="sensor-heading">--</span>
+        <span id="sensor-elevation">--</span>
+        <span id="sensor-level" class="sensor-level">--</span>
+        <span id="sensor-accuracy"></span>
+      </div>
+      <div id="camera-container">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-overlay"></canvas>
+        <button type="button" id="btn-resume-overlay" class="resume-overlay" hidden>
+          カメラ再開
+        </button>
+        <div id="camera-error" class="camera-error" hidden>
+          <p id="camera-error-msg">カメラを起動中...</p>
+          <button type="button" id="btn-camera-retry" class="btn-primary">再試行</button>
+        </div>
+      </div>
+      <div class="camera-controls">
+        <button type="button" id="btn-camera-toggle" class="btn-action">カメラ切替</button>
+        <button type="button" id="btn-camera-resume" class="btn-action" hidden>カメラ再開</button>
+        <button type="button" id="btn-undo" class="btn-action">取消</button>
+        <button type="button" id="btn-calibrate" class="btn-action">校正</button>
+      </div>
+    </section>
+
+    <!-- 登録済みポイントリスト -->
+    <section id="section-list" class="card">
+      <h2>
+        記録済みポイント
+        <span id="point-count">(0点)</span>
+        <span id="total-length">総延長: 0.000m</span>
+      </h2>
+      <div id="point-list" class="point-list">
+        <p class="empty-message">ポイントが登録されていません</p>
+      </div>
+    </section>
+
+    <!-- 3Dプレビュー -->
+    <section id="section-3d" class="card">
+      <h2>3Dプレビュー</h2>
+      <div id="viewer-container">
+        <!-- Three.js canvas will be inserted here -->
+      </div>
+      <div class="view-presets">
+        <button type="button" class="btn-view" data-view="front">正面</button>
+        <button type="button" class="btn-view" data-view="top">上面</button>
+        <button type="button" class="btn-view" data-view="side">側面</button>
+        <button type="button" class="btn-view" data-view="iso">3D</button>
+      </div>
+    </section>
+
+    <!-- プロジェクト管理・出力ボタン -->
+    <section id="section-actions" class="card">
+      <div class="action-group">
+        <h3>プロジェクト</h3>
+        <div class="action-buttons">
+          <button type="button" id="btn-save" class="btn-action">保存</button>
+          <button type="button" id="btn-load" class="btn-action">読込</button>
+          <button type="button" id="btn-new" class="btn-action btn-danger">新規</button>
+        </div>
+      </div>
+      <div class="action-group">
+        <h3>データ出力</h3>
+        <div class="action-buttons">
+          <button type="button" id="btn-export-csv" class="btn-export">CSV</button>
+          <button type="button" id="btn-export-dxf" class="btn-export">DXF</button>
+          <button type="button" id="btn-export-glb" class="btn-export">GLB</button>
+          <button type="button" id="btn-export-obj" class="btn-export">OBJ</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 設定モーダル -->
+  <div id="modal-settings" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2>プロジェクト設定</h2>
+      <form id="form-settings">
+        <div class="form-row">
+          <label for="input-project-name">プロジェクト名</label>
+          <input type="text" id="input-project-name" placeholder="例: A現場_2026年2月">
+        </div>
+        <div class="form-row">
+          <label for="input-site-name">現場名</label>
+          <input type="text" id="input-site-name" placeholder="例: 京都市下水道工事A-12区間">
+        </div>
+        <div class="form-row">
+          <label for="input-operator">作業者</label>
+          <input type="text" id="input-operator" placeholder="例: 山田太郎">
+        </div>
+        <div class="form-row">
+          <label for="input-pipe-type">配管種別</label>
+          <input type="text" id="input-pipe-type" placeholder="例: 塩ビ管">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">保存</button>
+          <button type="button" id="btn-settings-close" class="btn-secondary">閉じる</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- モード選択ダイアログ (Android+ARCore端末のみ表示) -->
+  <div id="modal-mode-select" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2>計測モードを選択</h2>
+      <p style="margin-bottom:16px;color:#666;">AR対応端末を検出しました。計測モードを選択してください。</p>
+      <div class="form-actions" style="flex-direction:column;gap:12px;">
+        <button type="button" id="btn-mode-snapshot" class="btn-primary" style="padding:14px;">
+          通常モード（スナップショット）
+        </button>
+        <button type="button" id="btn-mode-ar" class="btn-primary" style="padding:14px;background:#00897b;">
+          ARモード（空間アンカー）
+        </button>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#999;">ARモードはAndroid + Chrome + ARCore端末で動作します</p>
+    </div>
+  </div>
+
+  <!-- AR dom-overlay UI (AR session中に表示) -->
+  <div id="ar-overlay" hidden>
+    <div id="ar-overlay-header">
+      <span id="ar-status">面をタップしてアンカーを配置</span>
+      <span id="ar-point-count">0点</span>
+    </div>
+    <div id="ar-overlay-footer">
+      <button type="button" id="btn-ar-undo" class="btn-action">取消</button>
+      <button type="button" id="btn-ar-done" class="btn-primary">完了</button>
+    </div>
+    <!-- AR distance dialog (floating) -->
+    <div id="ar-distance-dialog" class="ar-floating-dialog" hidden>
+      <p id="ar-distance-title">区間距離</p>
+      <p id="ar-distance-measured" style="font-size:18px;font-weight:bold;"></p>
+      <div class="form-row" style="margin-top:8px;">
+        <input type="number" id="ar-input-distance" step="0.01" min="0" inputmode="decimal"
+               placeholder="実測で上書き（任意）">
+      </div>
+      <div class="form-row" style="margin-top:4px;">
+        <input type="text" id="ar-input-memo" maxlength="50" placeholder="メモ（任意）">
+      </div>
+      <div class="form-actions" style="margin-top:8px;">
+        <button type="button" id="btn-ar-distance-ok" class="btn-primary">確定</button>
+        <button type="button" id="btn-ar-distance-skip" class="btn-secondary">スキップ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 距離入力ダイアログ -->
+  <div id="modal-distance" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2 id="distance-dialog-title">区間距離の入力</h2>
+      <div id="distance-estimated" class="distance-estimated" hidden>
+        <span>推定距離: </span>
+        <strong id="distance-estimated-value">--</strong>
+      </div>
+      <form id="form-distance">
+        <div class="form-row">
+          <label for="input-distance">実測距離 (m)</label>
+          <input type="number" id="input-distance" step="0.01" min="0" inputmode="decimal"
+                 placeholder="例: 0.52">
+        </div>
+        <!-- Direction section (shown when direction mode is active) -->
+        <div id="direction-section" class="direction-section" hidden>
+          <label>方向</label>
+          <!-- Sensor auto display -->
+          <div id="direction-auto" hidden>
+            <p class="direction-auto-info">
+              方位: <strong id="direction-auto-heading">--</strong>
+              仰俯角: <strong id="direction-auto-elevation">--</strong>
+              <span id="direction-auto-source" class="direction-source"></span>
+            </p>
+          </div>
+          <!-- Manual preset buttons -->
+          <div id="direction-manual" hidden>
+            <div class="direction-presets">
+              <button type="button" class="btn-direction" data-dir="straight">直進</button>
+              <button type="button" class="btn-direction" data-dir="left">左折</button>
+              <button type="button" class="btn-direction" data-dir="right">右折</button>
+              <button type="button" class="btn-direction" data-dir="up">上昇</button>
+              <button type="button" class="btn-direction" data-dir="down">下降</button>
+            </div>
+            <div class="direction-angle-row">
+              <label for="input-direction-angle">詳細角度 (省略可)</label>
+              <input type="number" id="input-direction-angle" min="0" max="360" step="1"
+                     placeholder="0-360°" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="input-point-memo">メモ</label>
+          <input type="text" id="input-point-memo" maxlength="50" placeholder="任意（最大50文字）">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">確定</button>
+          <button type="button" id="btn-distance-skip" class="btn-secondary">スキップ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Direction mode selection dialog -->
+  <div id="modal-direction-mode" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2>方向記録方法の選択</h2>
+      <p id="direction-mode-info" style="margin-bottom:16px;color:#666;">
+        配管の方向をどのように記録しますか？
+      </p>
+      <div class="form-actions" style="flex-direction:column;gap:12px;">
+        <button type="button" id="btn-direction-sensor" class="btn-primary" style="padding:14px;">
+          コンパス自動
+          <small style="display:block;font-weight:400;font-size:12px;margin-top:4px;">
+            端末の向きから方向を自動記録
+          </small>
+        </button>
+        <button type="button" id="btn-direction-manual" class="btn-primary" style="padding:14px;background:#FF6F00;">
+          手動入力
+          <small style="display:block;font-weight:400;font-size:12px;margin-top:4px;">
+            直進/左折/右折/上/下 をボタンで指定
+          </small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Initial heading dialog (Level 3: gyro only, no compass) -->
+  <div id="modal-initial-heading" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2>初期方位の設定</h2>
+      <p style="margin-bottom:16px;color:#666;">
+        コンパスが利用できないため、配管の最初の方向を指定してください。
+        以降はジャイロで自動追跡します。
+      </p>
+      <div class="heading-presets">
+        <button type="button" class="heading-preset selected" data-heading="0">北 (0°)</button>
+        <button type="button" class="heading-preset" data-heading="90">東 (90°)</button>
+        <button type="button" class="heading-preset" data-heading="180">南 (180°)</button>
+        <button type="button" class="heading-preset" data-heading="270">西 (270°)</button>
+      </div>
+      <div class="form-row" style="margin-top:12px;">
+        <label for="input-initial-heading">または角度入力 (0-360°)</label>
+        <input type="number" id="input-initial-heading" min="0" max="360" step="1" value="0"
+               inputmode="numeric">
+      </div>
+      <div class="form-actions" style="margin-top:16px;">
+        <button type="button" id="btn-initial-heading-ok" class="btn-primary">決定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js (importmap) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Application Scripts -->
+  <script type="module" src="js/config.js"></script>
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
