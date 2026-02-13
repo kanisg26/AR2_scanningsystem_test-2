@@ -28,7 +28,7 @@
   <main id="app-main">
 
     <!-- カメラ映像セクション (全画面) -->
-    <section id="section-camera">
+    <section id="section-camera" hidden>
       <!-- Sensor status bar (overlay) -->
       <div id="sensor-status" class="sensor-status" hidden>
         <span id="sensor-heading">--</span>
@@ -51,13 +51,9 @@
         <button type="button" id="btn-undo" class="btn-action">取消</button>
         <button type="button" id="btn-calibrate" class="btn-action">校正</button>
         <button type="button" id="btn-camera-done" class="btn-action btn-done">完了</button>
+        <button type="button" id="btn-mode-reset" class="btn-action">モード変更</button>
       </div>
     </section>
-
-    <!-- 記録に戻るバー -->
-    <div id="bar-return-camera" class="return-camera-bar" hidden>
-      <button type="button" id="btn-return-camera" class="btn-primary">記録に戻る</button>
-    </div>
 
     <!-- 登録済みポイントリスト -->
     <section id="section-list" class="card">
@@ -68,6 +64,10 @@
       </h2>
       <div id="point-list" class="point-list">
         <p class="empty-message">ポイントが登録されていません</p>
+      </div>
+      <!-- 記録に戻るバー (ポイントリスト下部) -->
+      <div id="bar-return-camera" class="return-camera-bar" hidden>
+        <button type="button" id="btn-return-camera" class="btn-primary">記録に戻る</button>
       </div>
     </section>
 
@@ -184,22 +184,20 @@
     </div>
     <div id="ar-overlay-footer">
       <button type="button" id="btn-ar-undo" class="btn-action">取消</button>
+      <button type="button" id="btn-ar-calibrate" class="btn-action">校正</button>
       <button type="button" id="btn-ar-done" class="btn-primary">完了</button>
     </div>
-    <!-- AR distance dialog (floating) -->
-    <div id="ar-distance-dialog" class="ar-floating-dialog" hidden>
-      <p id="ar-distance-title">区間距離</p>
-      <p id="ar-distance-measured" style="font-size:18px;font-weight:bold;"></p>
+    <!-- AR calibration dialog (floating) -->
+    <div id="ar-calibration-dialog" class="ar-floating-dialog" hidden>
+      <p id="ar-calibration-title">校正: 実測距離を入力</p>
+      <p id="ar-calibration-measured" style="font-size:18px;font-weight:bold;"></p>
       <div class="form-row" style="margin-top:8px;">
-        <input type="number" id="ar-input-distance" step="0.01" min="0" inputmode="decimal"
-               placeholder="実測で上書き（任意）">
-      </div>
-      <div class="form-row" style="margin-top:4px;">
-        <input type="text" id="ar-input-memo" maxlength="50" placeholder="メモ（任意）">
+        <input type="number" id="ar-input-calibration" step="0.01" min="0" inputmode="decimal"
+               placeholder="実測距離 (m)">
       </div>
       <div class="form-actions" style="margin-top:8px;">
-        <button type="button" id="btn-ar-distance-ok" class="btn-primary">確定</button>
-        <button type="button" id="btn-ar-distance-skip" class="btn-secondary">スキップ</button>
+        <button type="button" id="btn-ar-calibration-ok" class="btn-primary">校正実行</button>
+        <button type="button" id="btn-ar-calibration-cancel" class="btn-secondary">キャンセル</button>
       </div>
     </div>
   </div>
