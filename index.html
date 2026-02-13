@@ -48,11 +48,16 @@
       </div>
       <div class="camera-controls">
         <button type="button" id="btn-camera-toggle" class="btn-action">カメラ切替</button>
-        <button type="button" id="btn-camera-resume" class="btn-action" hidden>カメラ再開</button>
         <button type="button" id="btn-undo" class="btn-action">取消</button>
         <button type="button" id="btn-calibrate" class="btn-action">校正</button>
+        <button type="button" id="btn-camera-done" class="btn-action btn-done">完了</button>
       </div>
     </section>
+
+    <!-- 記録に戻るバー -->
+    <div id="bar-return-camera" class="return-camera-bar" hidden>
+      <button type="button" id="btn-return-camera" class="btn-primary">記録に戻る</button>
+    </div>
 
     <!-- 登録済みポイントリスト -->
     <section id="section-list" class="card">
@@ -249,6 +254,30 @@
           手動入力
           <small style="display:block;font-weight:400;font-size:12px;margin-top:4px;">
             直進/左折/右折/上/下 をボタンで指定
+          </small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Distance mode selection dialog (compass auto mode) -->
+  <div id="modal-distance-mode" class="modal-overlay" hidden>
+    <div class="modal-dialog">
+      <h2>距離記録方法の選択</h2>
+      <p style="margin-bottom:16px;color:#666;">
+        配管の距離をどのように記録しますか？
+      </p>
+      <div class="form-actions" style="flex-direction:column;gap:12px;">
+        <button type="button" id="btn-distance-mode-manual" class="btn-primary" style="padding:14px;">
+          手動入力
+          <small style="display:block;font-weight:400;font-size:12px;margin-top:4px;">
+            タップごとに距離を入力
+          </small>
+        </button>
+        <button type="button" id="btn-distance-mode-auto" class="btn-primary" style="padding:14px;background:#00897b;">
+          タップ計測
+          <small style="display:block;font-weight:400;font-size:12px;margin-top:4px;">
+            初回校正後、タップ位置から距離を自動推定
           </small>
         </button>
       </div>
