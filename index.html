@@ -84,6 +84,27 @@
         <button type="button" class="btn-view" data-view="iso">3D</button>
         <button type="button" id="btn-origin-toggle" class="btn-view">原点:始点</button>
       </div>
+      <div class="viewer-options">
+        <div class="viewer-option-row">
+          <label>表示:</label>
+          <button type="button" id="btn-display-wire" class="btn-view active">線</button>
+          <button type="button" id="btn-display-pipe" class="btn-view">配管</button>
+          <input type="number" id="input-pipe-radius" min="1" step="1" value="50"
+                 placeholder="半径mm" class="input-pipe-radius" disabled>
+          <span class="pipe-radius-unit">mm</span>
+        </div>
+        <div class="viewer-option-row">
+          <label>距離:</label>
+          <button type="button" id="btn-toggle-labels" class="btn-view">非表示</button>
+          <label style="margin-left:12px;">グリッド:</label>
+          <select id="select-grid-size" class="select-grid">
+            <option value="5" selected>5m</option>
+            <option value="10">10m</option>
+            <option value="20">20m</option>
+            <option value="50">50m</option>
+          </select>
+        </div>
+      </div>
     </section>
 
     <!-- プロジェクト管理・出力ボタン -->
