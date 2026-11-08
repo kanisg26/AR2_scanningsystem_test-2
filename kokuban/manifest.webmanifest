@@ -1,0 +1,10 @@
+{
+  "name": "電子小黒板（試作）",
+  "short_name": "電子小黒板",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f2",
+  "theme_color": "#1F4D3A",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
